@@ -1,26 +1,50 @@
 #include <iostream>
-#include <stdio.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h> // Plik nag³ówkowy dodaj¹cy czcionki
+#include <allegro5/allegro_ttf.h>
+#include "Map.h"
+
+void init() {
+	al_install_keyboard(); // instalowanie sterownika klawiatury
+	al_init_primitives_addon();
+	al_install_mouse();
+}
+
+
 
 int main(int argc, char** argv){
 
 	al_init(); // inicjowanie biblioteki allegro
-	al_install_keyboard(); // instalowanie sterownika klawiatury
-
-	ALLEGRO_KEYBOARD_STATE klawiatura; // utworzenie struktury do odczytu stanu klawiatury
-	ALLEGRO_DISPLAY *okno = al_create_display(320, 240);// tworzymy wskaŸnik okna, i podajemy jego szer. i wys
-	al_set_window_title(okno, "Allegro5 kurs pierwsze okno");// podajemy tytu³ okna
+	init();
 	
-	while (al_key_down(&klawiatura, ALLEGRO_KEY_ESCAPE)) //koniec programu gdy wciœniemy klawisz Escape
+	al_set_new_window_position(300, 30);
+	ALLEGRO_DISPLAY *display = al_create_display(800, 700);// tworzymy wskaŸnik okna, i podajemy jego szer. i wys
+	al_set_window_title(display, "Othello");// podajemy tytu³ okna
+	
+	//KLAWIATURA I MYSZKA
+	ALLEGRO_KEYBOARD_STATE klawiatura; // utworzenie struktury do odczytu stanu klawiatury
+	al_get_keyboard_state(&klawiatura);
+
+	//EVENTY
+	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
+	event_queue = al_create_event_queue();
+	al_register_event_source(event_queue, al_get_display_event_source(display));
+	al_register_event_source(event_queue, al_get_mouse_event_source());
+
+	
+	
+	while (!al_key_down(&klawiatura, ALLEGRO_KEY_ESCAPE)) //koniec programu gdy wciœniemy klawisz Escape
 	{
-		printf("fun\n");
+		ALLEGRO_EVENT ev;
+
 		al_get_keyboard_state(&klawiatura);  // odczyt stanu klawiatury
-		al_clear_to_color(al_map_rgb(0, 255, 0)); // wyczyszczenie aktualnego bufora ekranu
+		board();
 		al_flip_display(); // wyœwietlenie aktualnego bufora na ekran
 	}
-	// usuwanie z pamiêci okna, bitmap, audio, fontów ...itd.
-	al_rest(3);
-	al_destroy_display(okno);
+
+	//al_rest(3);
+	al_destroy_display(display);
 	return 0;
 }
