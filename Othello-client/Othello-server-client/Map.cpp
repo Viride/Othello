@@ -3,13 +3,226 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h> // Plik nag³ówkowy dodaj¹cy czcionki
 #include <allegro5/allegro_ttf.h>
+#include <iostream>
+#include "Map.h"
+#include "Rules.h"
+#include <utility>
+#include <Windows.h>
+
+button single{ 200, 200, width_p - 200, height_p - 350 };
+button multi{ 200, 400, width_p - 200, height_p - 150 };
+board game_board_offline;
+board game_board_online;
 
 
 
-void board() {
-	ALLEGRO_FONT *font = al_create_builtin_font();//  wskaŸnik do czcionki bitmapowej
-	ALLEGRO_FONT *font_arial_18 = al_load_font("arial.ttf", 18, 0);//  wskaŸnik do czcionki bitmapowej
-	al_clear_to_color(al_map_rgb(91, 180, 75)); // wyczyszczenie aktualnego bufora ekranu
-	al_draw_text(font, al_map_rgb(255, 255, 255), 20, 20, 0, "Witaj w Allegro");
+void board_welcome(int mouse_x, int mouse_y, bool clicked, int &board_id) {
+	
+	ALLEGRO_FONT *arial_36 = al_load_font("arial.ttf", 36, 0);//  wskaŸnik do czcionki bitmapowej
 
+	al_clear_to_color(background_color); // wyczyszczenie aktualnego bufora ekranu
+	al_draw_filled_rectangle(single.x_up, single.y_up, single.x_down, single.y_down, button_color);
+	al_draw_filled_rectangle(multi.x_up, multi.y_up, multi.x_down, multi.y_down, button_color);
+	al_draw_text(arial_36, black_color, 335, 255 , 0, "OFFLINE");
+	al_draw_text(arial_36, black_color, 340, 455, 0, "ONLINE");
+
+	if (mouse_x >= single.x_up && mouse_x <= single.x_down && mouse_y >= single.y_up && mouse_y <= single.y_down) {
+		board_id = 1;
+		printf("klick %d \n", board_id);
+		init_tab(game_board_offline);
+	}
+	else if (mouse_x >= multi.x_up && mouse_x <= multi.x_down && mouse_y >= multi.y_up && mouse_y <= multi.y_down) {
+		board_id = 2;
+		printf("klick %d \n", board_id);
+		init_tab(game_board_online);
+	}
+	else {}
+	//al_draw_line(50, 200, width - 50, 400, al_map_rgb(0, 0, 255), 5);
+}
+
+void board_offline(int mouse_x, int mouse_y, bool clicked, int &board_id)
+{
+	ALLEGRO_FONT *arial_36 = al_load_font("arial.ttf", 36, 0);//  wskaŸnik do czcionki bitmapowej
+	int x = 0, y = 0;
+	int white_score = 0, black_score = 0;
+	bool end = false;
+	bool change = false;
+	bool is_move_b = false;
+	draw_board_offline();
+	draw_color(game_board_offline);
+	is_end(game_board_offline.tab_color, end);
+	if (end != true) 
+	{
+		x = mouse(mouse_x, mouse_y).first;
+		y = mouse(mouse_x, mouse_y).second;
+		if (x != 8 && y != 8) 
+		{
+			printf("x: %d, y: %d, turn: %d\n", x, y, game_board_offline.turn);
+			is_move(game_board_offline.tab_color, game_board_offline.turn, is_move_b);
+			if (is_move_b == true) 
+			{
+				check_move(x, y, game_board_offline.tab_color, game_board_offline.turn, change);
+			}
+			else
+				change = true;
+			if (change == true) 
+			{
+				if (game_board_offline.turn == black) game_board_offline.turn = white;
+				else if (game_board_offline.turn == white) game_board_offline.turn = black;
+			}
+		}
+	}
+	else 
+	{
+		for (int i = 8;i > 0;i--) {
+			al_draw_filled_rectangle(150, 200, 650, 400, button_color);
+			al_draw_text(arial_36, black_color, 240, 270, 0, "WHITE          BLACK");
+			al_draw_textf(arial_36, black_color, 288, 300, 0, "%d                    %d", result(game_board_offline.tab_color).first, result(game_board_offline.tab_color).second);
+			al_draw_textf(arial_36, black_color, 400, 330, 0, "%d", i);
+			al_flip_display();
+			Sleep(1000);
+		}
+		board_id = 0;
+	}
+}
+
+void board_online(int mouse_x, int mouse_y, bool clicked, int &board_id)
+{
+	draw_board_online();
+	draw_color(game_board_online);
+
+}
+
+void draw_board_offline()
+{
+	al_clear_to_color(background_color); // wyczyszczenie aktualnego bufora ekranu
+
+	al_draw_line(100, 75, 100, 675, line_color, 1);
+	al_draw_line(175, 75, 175, 675, line_color, 1);
+	al_draw_line(250, 75, 250, 675, line_color, 1);
+	al_draw_line(325, 75, 325, 675, line_color, 1);
+	al_draw_line(400, 75, 400, 675, line_color, 1);
+	al_draw_line(475, 75, 475, 675, line_color, 1);
+	al_draw_line(550, 75, 550, 675, line_color, 1);
+	al_draw_line(625, 75, 625, 675, line_color, 1);
+	al_draw_line(700, 75, 700, 675, line_color, 1);
+
+	al_draw_line(100, 75, 700, 75, line_color, 1);
+	al_draw_line(100, 150, 700, 150, line_color, 1);
+	al_draw_line(100, 225, 700, 225, line_color, 1);
+	al_draw_line(100, 300, 700, 300, line_color, 1);
+	al_draw_line(100, 375, 700, 375, line_color, 1);
+	al_draw_line(100, 450, 700, 450, line_color, 1);
+	al_draw_line(100, 525, 700, 525, line_color, 1);
+	al_draw_line(100, 600, 700, 600, line_color, 1);
+	al_draw_line(100, 675, 700, 675, line_color, 1);
+}
+
+void draw_board_online()
+{
+	al_clear_to_color(background_color); // wyczyszczenie aktualnego bufora ekranu
+	al_draw_line(100, 75, 100, 675, line_color, 1);
+	al_draw_line(175, 75, 175, 675, line_color, 1);
+	al_draw_line(250, 75, 250, 675, line_color, 1);
+	al_draw_line(325, 75, 325, 675, line_color, 1);
+	al_draw_line(400, 75, 400, 675, line_color, 1);
+	al_draw_line(475, 75, 475, 675, line_color, 1);
+	al_draw_line(550, 75, 550, 675, line_color, 1);
+	al_draw_line(625, 75, 625, 675, line_color, 1);
+	al_draw_line(700, 75, 700, 675, line_color, 1);
+
+	al_draw_line(100, 75, 700, 75, line_color, 1);
+	al_draw_line(100, 150, 700, 150, line_color, 1);
+	al_draw_line(100, 225, 700, 225, line_color, 1);
+	al_draw_line(100, 300, 700, 300, line_color, 1);
+	al_draw_line(100, 375, 700, 375, line_color, 1);
+	al_draw_line(100, 450, 700, 450, line_color, 1);
+	al_draw_line(100, 525, 700, 525, line_color, 1);
+	al_draw_line(100, 600, 700, 600, line_color, 1);
+	al_draw_line(100, 675, 700, 675, line_color, 1);
+
+}
+
+void init_tab(board &game_board)
+{
+	for (int i = 0;i < 9;i++) {
+		std::vector<int> temp;
+		for (int j = 0;j < 9;j++) {
+			temp.push_back(0);
+		}
+		game_board_offline.tab_color.push_back(temp);
+	}
+	int x = 100;
+	int y = 75;
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			game_board.tab_x_up[j][i]=x;
+			game_board.tab_x_down[j][i]=x+74;
+			game_board.tab_y_up[i][j]=y;
+			game_board.tab_y_down[i][j]=y+74;
+			game_board.tab_color[i][j] = 0;
+		}
+		x = x + 75;
+		y = y + 75;
+	}
+
+	/*game_board.tab_color[3][3] = white;
+	game_board.tab_color[3][4] = black;
+	game_board.tab_color[4][3] = black;
+	game_board.tab_color[4][4] = white;*/
+	game_board.tab_color[0][0] = black;
+	game_board.tab_color[1][1] = white;
+	game_board.tab_color[2][2] = white;
+	//game_board.tab_color[2][4] = black;
+	game_board.turn = white;
+}
+
+void draw_color(board game_board)
+{
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (game_board.tab_color[i][j] == black) 
+			{
+				al_draw_filled_rectangle(game_board.tab_x_up[i][j], game_board.tab_y_up[i][j], game_board.tab_x_down[i][j], game_board.tab_y_down[i][j], black_color);
+			}
+			else if (game_board.tab_color[i][j] == white)
+			{
+				al_draw_filled_rectangle(game_board.tab_x_up[i][j], game_board.tab_y_up[i][j], game_board.tab_x_down[i][j], game_board.tab_y_down[i][j], white_color);
+			}
+		}
+	}
+	if (game_board.turn == white) {
+		//al_draw_filled_rectangle(0, 0, 99, 700, white_color);
+		//al_draw_filled_rectangle(701, 0, 800, 700, white_color);
+		al_draw_filled_rounded_rectangle(150, 20, 650, 60, 5, 5, white_color);
+
+	}
+	else 
+	{
+		//al_draw_filled_rectangle(0, 0, 99, 700, black_color);
+		//al_draw_filled_rectangle(701, 0, 800, 700, black_color);
+		al_draw_filled_rounded_rectangle(150, 20, 650, 60, 5, 5, black_color);
+	}
+}
+
+
+std::pair<int, int> mouse(int mouse_x, int mouse_y)
+{
+	std::pair<int, int> mouse_cords;
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (mouse_y > game_board_offline.tab_y_up[i][j] && mouse_y < game_board_offline.tab_y_down[i][j] &&
+				(mouse_x > game_board_offline.tab_x_up[i][j] && mouse_x < game_board_offline.tab_x_down[i][j])) 
+			{
+				mouse_cords.first = i;
+				mouse_cords.second = j;
+				return mouse_cords;
+			}
+
+		}
+	}
+	mouse_cords.first = 8;
+	mouse_cords.second = 8;
+	return mouse_cords;
+	
 }
