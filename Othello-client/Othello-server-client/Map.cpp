@@ -13,6 +13,8 @@ button single{ 200, 200, width_p - 200, height_p - 350 };
 button multi{ 200, 400, width_p - 200, height_p - 150 };
 board game_board_offline;
 board game_board_online;
+bool offline_initialized = false;
+bool online_initialized = false;
 
 
 
@@ -28,13 +30,23 @@ void board_welcome(int mouse_x, int mouse_y, bool clicked, int &board_id) {
 
 	if (mouse_x >= single.x_up && mouse_x <= single.x_down && mouse_y >= single.y_up && mouse_y <= single.y_down) {
 		board_id = 1;
-		printf("klick %d \n", board_id);
-		init_tab(game_board_offline);
+		printf("Offline %d \n", board_id);
+		if (offline_initialized == false) 
+		{
+			init_tab(game_board_offline);
+			offline_initialized = true;
+		}
+		clear_colors(game_board_offline.tab_color);
 	}
 	else if (mouse_x >= multi.x_up && mouse_x <= multi.x_down && mouse_y >= multi.y_up && mouse_y <= multi.y_down) {
 		board_id = 2;
-		printf("klick %d \n", board_id);
-		init_tab(game_board_online);
+		printf("Online %d \n", board_id);
+		if (online_initialized == false) {
+			init_tab(game_board_online);
+			online_initialized = true;
+		}
+		clear_colors(game_board_online.tab_color);
+		connect();
 	}
 	else {}
 	//al_draw_line(50, 200, width - 50, 400, al_map_rgb(0, 0, 255), 5);
@@ -44,7 +56,6 @@ void board_offline(int mouse_x, int mouse_y, bool clicked, int &board_id)
 {
 	ALLEGRO_FONT *arial_36 = al_load_font("arial.ttf", 36, 0);//  wskaŸnik do czcionki bitmapowej
 	int x = 0, y = 0;
-	int white_score = 0, black_score = 0;
 	bool end = false;
 	bool change = false;
 	bool is_move_b = false;
@@ -53,8 +64,8 @@ void board_offline(int mouse_x, int mouse_y, bool clicked, int &board_id)
 	is_end(game_board_offline.tab_color, end);
 	if (end != true) 
 	{
-		x = mouse(mouse_x, mouse_y).first;
-		y = mouse(mouse_x, mouse_y).second;
+		x = mouse(mouse_x, mouse_y, game_board_offline).first;
+		y = mouse(mouse_x, mouse_y, game_board_offline).second;
 		if (x != 8 && y != 8) 
 		{
 			printf("x: %d, y: %d, turn: %d\n", x, y, game_board_offline.turn);
@@ -79,6 +90,7 @@ void board_offline(int mouse_x, int mouse_y, bool clicked, int &board_id)
 			al_draw_text(arial_36, black_color, 240, 270, 0, "WHITE          BLACK");
 			al_draw_textf(arial_36, black_color, 288, 300, 0, "%d                    %d", result(game_board_offline.tab_color).first, result(game_board_offline.tab_color).second);
 			al_draw_textf(arial_36, black_color, 400, 330, 0, "%d", i);
+
 			al_flip_display();
 			Sleep(1000);
 		}
@@ -88,8 +100,48 @@ void board_offline(int mouse_x, int mouse_y, bool clicked, int &board_id)
 
 void board_online(int mouse_x, int mouse_y, bool clicked, int &board_id)
 {
+	ALLEGRO_FONT *arial_36 = al_load_font("arial.ttf", 36, 0);//  wskaŸnik do czcionki bitmapowej
+
+	int x = 0, y = 0;
+	bool end = false;
+	bool change = false;
+	bool is_move_b = false;
 	draw_board_online();
 	draw_color(game_board_online);
+	is_end(game_board_online.tab_color, end);
+	if (end != true)
+	{
+		x = mouse(mouse_x, mouse_y, game_board_online).first;
+		y = mouse(mouse_x, mouse_y, game_board_online).second;
+		if (x != 8 && y != 8)
+		{
+			printf("x: %d, y: %d, turn: %d\n", x, y, game_board_online.turn);
+			is_move(game_board_online.tab_color, game_board_online.turn, is_move_b);
+			if (is_move_b == true)
+			{
+				check_move(x, y, game_board_online.tab_color, game_board_online.turn, change);
+			}
+			else
+				change = true;
+			if (change == true)
+			{
+				if (game_board_online.turn == black) game_board_online.turn = white;
+				else if (game_board_online.turn == white) game_board_online.turn = black;
+			}
+		}
+	}
+	else
+	{
+		for (int i = 8;i > 0;i--) {
+			al_draw_filled_rectangle(150, 200, 650, 400, button_color);
+			al_draw_text(arial_36, black_color, 240, 270, 0, "WHITE          BLACK");
+			al_draw_textf(arial_36, black_color, 288, 300, 0, "%d                    %d", result(game_board_online.tab_color).first, result(game_board_online.tab_color).second);
+			al_draw_textf(arial_36, black_color, 400, 330, 0, "%d", i);
+			al_flip_display();
+			Sleep(1000);
+		}
+		board_id = 0;
+	}
 
 }
 
@@ -150,7 +202,7 @@ void init_tab(board &game_board)
 		for (int j = 0;j < 9;j++) {
 			temp.push_back(0);
 		}
-		game_board_offline.tab_color.push_back(temp);
+		game_board.tab_color.push_back(temp);
 	}
 	int x = 100;
 	int y = 75;
@@ -170,11 +222,12 @@ void init_tab(board &game_board)
 	game_board.tab_color[3][4] = black;
 	game_board.tab_color[4][3] = black;
 	game_board.tab_color[4][4] = white;*/
-	game_board.tab_color[0][0] = black;
+	/*game_board.tab_color[0][0] = black;
 	game_board.tab_color[1][1] = white;
-	game_board.tab_color[2][2] = white;
+	game_board.tab_color[2][2] = white;*/
 	//game_board.tab_color[2][4] = black;
 	game_board.turn = white;
+	printf("Initializing complete\n");
 }
 
 void draw_color(board game_board)
@@ -206,13 +259,13 @@ void draw_color(board game_board)
 }
 
 
-std::pair<int, int> mouse(int mouse_x, int mouse_y)
+std::pair<int, int> mouse(int mouse_x, int mouse_y, board &game_board)
 {
 	std::pair<int, int> mouse_cords;
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			if (mouse_y > game_board_offline.tab_y_up[i][j] && mouse_y < game_board_offline.tab_y_down[i][j] &&
-				(mouse_x > game_board_offline.tab_x_up[i][j] && mouse_x < game_board_offline.tab_x_down[i][j])) 
+			if (mouse_y > game_board.tab_y_up[i][j] && mouse_y < game_board.tab_y_down[i][j] &&
+				(mouse_x > game_board.tab_x_up[i][j] && mouse_x < game_board.tab_x_down[i][j])) 
 			{
 				mouse_cords.first = i;
 				mouse_cords.second = j;
@@ -225,4 +278,21 @@ std::pair<int, int> mouse(int mouse_x, int mouse_y)
 	mouse_cords.second = 8;
 	return mouse_cords;
 	
+}
+
+void connect()
+{
+}
+
+void clear_colors(std::vector<std::vector<int>>& tab_color)
+{
+	for (int i = 0;i < 8; i++) {
+		for (int j = 0;j < 8; j++) {
+			tab_color[i][j] = 0;
+		}
+	}
+	tab_color[3][3] = white;
+	tab_color[3][4] = black;
+	tab_color[4][3] = black;
+	tab_color[4][4] = white;
 }

@@ -36,6 +36,8 @@ void draw_board_offline();
 void draw_board_online();
 void init_tab(board &game_board);
 void draw_color(board game_board);
-std::pair<int, int> mouse(int mouse_x, int mouse_y);
+std::pair<int, int> mouse(int mouse_x, int mouse_y, board &game_board);
+void connect();
+void clear_colors(std::vector<std::vector<int>> &tab_color);
 
 
