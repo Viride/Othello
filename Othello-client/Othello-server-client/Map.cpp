@@ -58,7 +58,6 @@ void board_offline(int mouse_x, int mouse_y, bool clicked, int &board_id)
 	int x = 0, y = 0;
 	bool end = false;
 	bool change = false;
-	bool is_move_b = false;
 	draw_board_offline();
 	draw_color(game_board_offline);
 	is_end(game_board_offline.tab_color, end);
@@ -69,18 +68,13 @@ void board_offline(int mouse_x, int mouse_y, bool clicked, int &board_id)
 		if (x != 8 && y != 8) 
 		{
 			printf("x: %d, y: %d, turn: %d\n", x, y, game_board_offline.turn);
-			is_move(game_board_offline.tab_color, game_board_offline.turn, is_move_b);
-			if (is_move_b == true) 
-			{
-				check_move(x, y, game_board_offline.tab_color, game_board_offline.turn, change);
-			}
-			else
-				change = true;
+			check_move(x, y, game_board_offline.tab_color, game_board_offline.turn, change);
 			if (change == true) 
 			{
 				if (game_board_offline.turn == black) game_board_offline.turn = white;
 				else if (game_board_offline.turn == white) game_board_offline.turn = black;
 			}
+			is_move2(game_board_offline.tab_color, game_board_offline.turn);
 		}
 	}
 	else 
@@ -105,7 +99,6 @@ void board_online(int mouse_x, int mouse_y, bool clicked, int &board_id)
 	int x = 0, y = 0;
 	bool end = false;
 	bool change = false;
-	bool is_move_b = false;
 	draw_board_online();
 	draw_color(game_board_online);
 	is_end(game_board_online.tab_color, end);
@@ -116,18 +109,14 @@ void board_online(int mouse_x, int mouse_y, bool clicked, int &board_id)
 		if (x != 8 && y != 8)
 		{
 			printf("x: %d, y: %d, turn: %d\n", x, y, game_board_online.turn);
-			is_move(game_board_online.tab_color, game_board_online.turn, is_move_b);
-			if (is_move_b == true)
-			{
-				check_move(x, y, game_board_online.tab_color, game_board_online.turn, change);
-			}
-			else
-				change = true;
+			check_move(x, y, game_board_online.tab_color, game_board_online.turn, change);
 			if (change == true)
 			{
 				if (game_board_online.turn == black) game_board_online.turn = white;
 				else if (game_board_online.turn == white) game_board_online.turn = black;
 			}
+			is_move2(game_board_online.tab_color, game_board_online.turn);
+
 		}
 	}
 	else
@@ -295,4 +284,13 @@ void clear_colors(std::vector<std::vector<int>>& tab_color)
 	tab_color[3][4] = black;
 	tab_color[4][3] = black;
 	tab_color[4][4] = white;
+	//tab_color[0][0] = black;
+	//tab_color[1][1] = white;
+	//tab_color[2][2] = white;
+	//tab_color[2][4] = black;
+	/*tab_color[0][0] = white;
+	tab_color[1][1] = black;
+	tab_color[2][2] = black;
+	tab_color[4][4] = black;*/
+
 }

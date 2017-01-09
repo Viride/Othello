@@ -16,6 +16,7 @@ void check_down_left(int x, int y, std::vector<std::vector<int>> &tab_color, int
 void check_left(int x, int y, std::vector<std::vector<int>> &tab_color, int turn, bool &move);
 void check_up_left(int x, int y, std::vector<std::vector<int>> &tab_color, int turn, bool &move);
 void is_move(std::vector<std::vector<int>> &tab_color, int turn, bool &is_move_b);
+void is_move2(std::vector<std::vector<int>> &tab_color, int &turn);
 void is_move_up(int x, int y, std::vector<std::vector<int>> &tab_color, int turn, bool &move);
 void is_move_up_right(int x, int y, std::vector<std::vector<int>> &tab_color, int turn, bool &move);
 void is_move_right(int x, int y, std::vector<std::vector<int>> &tab_color, int turn, bool &move);

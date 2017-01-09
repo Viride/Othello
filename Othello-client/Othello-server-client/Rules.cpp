@@ -55,6 +55,35 @@ void is_move(std::vector<std::vector<int>>& tab_color, int turn, bool & is_move_
 	}
 }
 
+void is_move2(std::vector<std::vector<int>>& tab_color, int & turn)
+{
+	bool move = false;
+	for (int x = 0;x < 8; x++) {
+		for (int y = 0;y < 8; y++) {
+			is_move_up(x, y, tab_color, turn, move);
+			is_move_up_right(x, y, tab_color, turn, move);
+			is_move_right(x, y, tab_color, turn, move);
+			is_move_down_right(x, y, tab_color, turn, move);
+			is_move_down(x, y, tab_color, turn, move);
+			is_move_down_left(x, y, tab_color, turn, move);
+			is_move_left(x, y, tab_color, turn, move);
+			is_move_up_left(x, y, tab_color, turn, move);
+			if (move == true)
+			{
+				break;
+			}
+		}
+		if (move == true)
+		{
+			break;
+		}
+	}
+	if (move == false) {
+		if (turn == black) turn = white;
+		else if (turn == white) turn = black;
+	}
+}
+
 void check_up(int x, int y, std::vector<std::vector<int>> &tab_color, int turn, bool &move)
 {
 	if (tab_color[x][y] == 0) {
