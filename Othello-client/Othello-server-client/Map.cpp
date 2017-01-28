@@ -21,12 +21,12 @@ bool online_initialized = false;
 void board_welcome(int mouse_x, int mouse_y, bool clicked, int &board_id) {
 	
 	ALLEGRO_FONT *arial_36 = al_load_font("arial.ttf", 36, 0);//  wskaŸnik do czcionki bitmapowej
-
 	al_clear_to_color(background_color); // wyczyszczenie aktualnego bufora ekranu
 	al_draw_filled_rectangle(single.x_up, single.y_up, single.x_down, single.y_down, button_color);
 	al_draw_filled_rectangle(multi.x_up, multi.y_up, multi.x_down, multi.y_down, button_color);
-	al_draw_text(arial_36, black_color, 335, 255 , 0, "OFFLINE");
-	al_draw_text(arial_36, black_color, 340, 455, 0, "ONLINE");
+	//al_draw_text(arial_36, black_color, 335, 255 , 0, "OFFLINE");
+	//al_draw_text(arial_36, black_color, 340, 455, 0, "ONLINE");
+
 
 	if (mouse_x >= single.x_up && mouse_x <= single.x_down && mouse_y >= single.y_up && mouse_y <= single.y_down) {
 		board_id = 1;
@@ -41,7 +41,8 @@ void board_welcome(int mouse_x, int mouse_y, bool clicked, int &board_id) {
 	else if (mouse_x >= multi.x_up && mouse_x <= multi.x_down && mouse_y >= multi.y_up && mouse_y <= multi.y_down) {
 		board_id = 2;
 		printf("Online %d \n", board_id);
-		if (online_initialized == false) {
+		if (online_initialized == false) 
+		{
 			init_tab(game_board_online);
 			online_initialized = true;
 		}
@@ -49,6 +50,7 @@ void board_welcome(int mouse_x, int mouse_y, bool clicked, int &board_id) {
 		connect();
 	}
 	else {}
+
 	//al_draw_line(50, 200, width - 50, 400, al_map_rgb(0, 0, 255), 5);
 }
 

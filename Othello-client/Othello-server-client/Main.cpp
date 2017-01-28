@@ -31,10 +31,13 @@ int main(int argc, char** argv){
 	al_init(); // inicjowanie biblioteki allegro
 	init();
 	
+
 	al_set_new_window_position(300, 30);
 	ALLEGRO_DISPLAY *display = al_create_display(width_p, height_p);// tworzymy wskaünik okna, i podajemy jego szer. i wys
 	al_set_window_title(display, "Othello");// podajemy tytu≥ okna
 	
+
+
 	//EVENTY
 	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 	event_queue = al_create_event_queue();
@@ -42,8 +45,11 @@ int main(int argc, char** argv){
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 	al_register_event_source(event_queue, al_get_mouse_event_source());
 
+
 	board_welcome(mouse_x, mouse_y, clicked, board_id);
-	
+
+
+
 	while (!done) //koniec programu gdy wciúniemy klawisz Escape
 	{
 		ALLEGRO_EVENT ev;
