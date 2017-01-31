@@ -6,6 +6,7 @@
 #include <iostream>
 #include "Map.h"
 #include "Rules.h"
+#include "NetworkServices.h"
 #include <utility>
 #include <Windows.h>
 
