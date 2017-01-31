@@ -7,8 +7,12 @@
 #define line_color al_map_rgb(255, 0, 0)
 #define width_p 800
 #define height_p 700
-#define black 33
-#define white 34
+#define black 2
+#define white 1
+
+#define DEFAULT_BUFLEN 1024
+#define DEFAULT_PORT "1234"
+#define DEFAULT_ADDRES "192.168.1.10"
 
 typedef struct
 {
@@ -31,7 +35,7 @@ typedef struct
 
 void board_welcome(int mouse_x, int mouse_y, bool clicked, int &board_id);
 void board_offline(int mouse_x, int mouse_y, bool clicked, int &board_id);
-void board_online(int mouse_x, int mouse_y, bool clicked, int &board_id);
+void board_online(int mouse_x, int mouse_y, bool clicked, int &board_id, int ConnectSocket);
 void draw_board_offline();
 void draw_board_online();
 void init_tab(board &game_board);
