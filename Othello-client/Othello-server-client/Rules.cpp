@@ -298,14 +298,14 @@ void check_down_left(int x, int y, std::vector<std::vector<int>> &tab_color, int
 	if (tab_color[x][y] == 0) {
 		bool ok = false;
 		int i = x + 2, j = y - 2;
-		while ((i >= 0) && (j >= 0))
+		while ((i < 8) && (j >= 0))
 		{
 			if (tab_color[x + 1][y - 1] == turn || tab_color[x + 1][y - 1] == 0) break;
 			if (tab_color[x + 2][y - 2] == 0) break;
 			if ((tab_color[i][j] != 0) && (tab_color[i][j] == turn)) {
 				ok = true;
 			}
-			i--;
+			i++;
 			j--;
 		}
 		if (ok == true) {
@@ -335,7 +335,7 @@ void is_move_down_left(int x, int y, std::vector<std::vector<int>>& tab_color, i
 			if ((tab_color[i][j] != 0) && (tab_color[i][j] == turn)) {
 				move = true;
 			}
-			i--;
+			i++;
 			j--;
 		}
 	}

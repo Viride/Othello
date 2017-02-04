@@ -114,18 +114,19 @@ void board_online(int mouse_x, int mouse_y, bool clicked, int &board_id, int Con
 		if (iResult == SOCKET_ERROR) {
 			printf("send failed: %d\n", WSAGetLastError());
 		}
+		connected_color = true;
 	}
 	
 	ALLEGRO_FONT *arial_36 = al_load_font("arial.ttf", 36, 0);//  wskaünik do czcionki bitmapowej
 
 	int x = 0, y = 0;
 	int send_number;
-	bool end = false;
+	game_board_online.end = false;
 	bool change = false;
 	draw_board_online();
 	draw_color(game_board_online);
-	is_end(game_board_online.tab_color, end);
-	if (end != true)
+	is_end(game_board_online.tab_color, game_board_online.end);
+	if (game_board_online.end != true)
 	{
 		if(game_board_online.turn == myColor){
 			x = mouse(mouse_x, mouse_y, game_board_online).first;
@@ -159,6 +160,64 @@ void board_online(int mouse_x, int mouse_y, bool clicked, int &board_id, int Con
 	}
 	else
 	{
+		sendbuf = "888\n";
+		iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
+		if (iResult == SOCKET_ERROR) {
+			printf("send failed: %d\n", WSAGetLastError());
+		}
+		for (int i = 8;i > 0;i--) {
+			al_draw_filled_rectangle(150, 200, 650, 400, button_color);
+			al_draw_text(arial_36, black_color, 240, 270, 0, "WHITE          BLACK");
+			al_draw_textf(arial_36, black_color, 288, 300, 0, "%d                    %d", result(game_board_online.tab_color).first, result(game_board_online.tab_color).second);
+			al_draw_textf(arial_36, black_color, 400, 330, 0, "%d", i);
+			al_flip_display();
+			Sleep(1000);
+		}
+		board_id = 0;
+	}
+
+}
+
+void board_online_receive(int mouse_x, int mouse_y, bool clicked, int &board_id, int ConnectSocket)
+{
+	int x = 0, y = 0;
+	iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+	///obsuga odebranej wiadomosci
+
+	int send_number;
+	bool change = false;
+	draw_board_online();
+	draw_color(game_board_online);
+	is_end(game_board_online.tab_color, game_board_online.end);
+	if (game_board_online.end != true)
+	{
+		if (game_board_online.turn == myColor) {
+			x = mouse(mouse_x, mouse_y, game_board_online).first;
+			y = mouse(mouse_x, mouse_y, game_board_online).second;
+			if (x != 8 && y != 8)
+			{
+				printf("x: %d, y: %d, turn: %d\n", x, y, game_board_online.turn);
+				check_move(x, y, game_board_online.tab_color, game_board_online.turn, change);
+				if (change == true)
+				{
+					if (game_board_online.turn == black)
+					{
+						game_board_online.turn = white;
+					}
+					else if (game_board_online.turn == white)
+					{
+						game_board_online.turn = black;
+					}
+
+				}
+				is_move2(game_board_online.tab_color, game_board_online.turn);
+			}
+		}
+	}
+	else
+	{
+		ALLEGRO_FONT *arial_36 = al_load_font("arial.ttf", 36, 0);//  wskaünik do czcionki bitmapowej
+
 		sendbuf = "888\n";
 		iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
 		if (iResult == SOCKET_ERROR) {
@@ -249,7 +308,7 @@ void init_tab(board &game_board)
 		x = x + 75;
 		y = y + 75;
 	}
-
+	game_board.end = false;
 	/*game_board.tab_color[3][3] = white;
 	game_board.tab_color[3][4] = black;
 	game_board.tab_color[4][3] = black;

@@ -12,7 +12,7 @@
 
 #define DEFAULT_BUFLEN 1024
 #define DEFAULT_PORT "1234"
-#define DEFAULT_ADDRES "192.168.1.10"
+#define DEFAULT_ADDRES "192.168.1.18"
 
 typedef struct
 {
@@ -29,6 +29,7 @@ typedef struct
 	int tab_x_down[8][8];
 	int tab_y_down[8][8];
 	int turn;
+	bool end;
 	std::vector<std::vector<int> > tab_color;
 
 }board;
@@ -36,6 +37,7 @@ typedef struct
 void board_welcome(int mouse_x, int mouse_y, bool clicked, int &board_id);
 void board_offline(int mouse_x, int mouse_y, bool clicked, int &board_id);
 void board_online(int mouse_x, int mouse_y, bool clicked, int &board_id, int ConnectSocket);
+void board_online_receive(int mouse_x, int mouse_y, bool clicked, int &board_id, int ConnectSocket);
 void draw_board_offline();
 void draw_board_online();
 void init_tab(board &game_board);
