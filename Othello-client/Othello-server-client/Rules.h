@@ -2,8 +2,8 @@
 #define background_color al_map_rgb(91, 180, 75)
 #define button_color al_map_rgb(61, 133, 220)
 #define black_color al_map_rgb(0, 0, 0)
-#define black 33
-#define white 34
+#define black 2
+#define white 1
 
 
 void check_move(int x, int y, std::vector<std::vector<int>> &tab_color, int turn, bool &change);

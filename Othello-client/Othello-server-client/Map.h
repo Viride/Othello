@@ -12,7 +12,7 @@
 
 #define DEFAULT_BUFLEN 1024
 #define DEFAULT_PORT "1234"
-#define DEFAULT_ADDRES "192.168.1.18"
+#define DEFAULT_ADDRES "192.168.1.10"
 
 typedef struct
 {

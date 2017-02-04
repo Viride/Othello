@@ -22,6 +22,7 @@ int myColor = 0;
 
 int recvbuflen = DEFAULT_BUFLEN;
 char *sendbuf = "ok\n";
+char sendbufor[DEFAULT_BUFLEN];
 char recvbuf[DEFAULT_BUFLEN];
 int iResult;
 bool connected_color = false;
@@ -106,11 +107,11 @@ void board_offline(int mouse_x, int mouse_y, bool clicked, int &board_id)
 void board_online(int mouse_x, int mouse_y, bool clicked, int &board_id, int ConnectSocket)
 {
 	if (connected_color == false) {
-		iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+		iResult = recv(ConnectSocket, recvbuf, DEFAULT_BUFLEN, 0);
 		if (recvbuf[2] == '1') myColor = white;
 		else myColor = black;
 		printf("Moj kolor to: %d\n", myColor);
-		iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
+		iResult = send(ConnectSocket, sendbuf, DEFAULT_BUFLEN, 0);
 		if (iResult == SOCKET_ERROR) {
 			printf("send failed: %d\n", WSAGetLastError());
 		}
@@ -119,84 +120,110 @@ void board_online(int mouse_x, int mouse_y, bool clicked, int &board_id, int Con
 	
 	ALLEGRO_FONT *arial_36 = al_load_font("arial.ttf", 36, 0);//  wskaŸnik do czcionki bitmapowej
 
-	int x = 0, y = 0;
-	int send_number;
-	game_board_online.end = false;
-	bool change = false;
-	draw_board_online();
-	draw_color(game_board_online);
-	is_end(game_board_online.tab_color, game_board_online.end);
-	if (game_board_online.end != true)
-	{
-		if(game_board_online.turn == myColor){
-			x = mouse(mouse_x, mouse_y, game_board_online).first;
-			y = mouse(mouse_x, mouse_y, game_board_online).second;
-			if (x != 8 && y != 8)
-			{
-				printf("x: %d, y: %d, turn: %d\n", x, y, game_board_online.turn);
-				check_move(x, y, game_board_online.tab_color, game_board_online.turn, change);
-				if (change == true)
-				{
-					if (game_board_online.turn == black)
-					{
-						game_board_online.turn = white;
-						send_number = x * 100 + y * 10 + game_board_online.turn;
-						std::string s = std::to_string(send_number);
-						char const *sendbufor = s.c_str();
-						iResult = send(ConnectSocket, sendbufor, (int)strlen(sendbuf), 0);
-						if (iResult == SOCKET_ERROR) {
-							printf("send failed: %d\n", WSAGetLastError());
-						}
-					}
-					else if (game_board_online.turn == white) 
-					{
-						game_board_online.turn = black;
-					}
+	if (game_board_online.turn == myColor && game_board_online.end != true) {
 
+		int x = 0, y = 0;
+		int send_number;
+		game_board_online.end = false;
+		bool change = false;
+		draw_board_online();
+		draw_color(game_board_online);
+		is_end(game_board_online.tab_color, game_board_online.end);
+		if (game_board_online.end != true)
+		{
+
+			if (game_board_online.turn == myColor) {
+				x = mouse(mouse_x, mouse_y, game_board_online).first;
+				y = mouse(mouse_x, mouse_y, game_board_online).second;
+				if (x != 8 && y != 8)
+				{
+					//printf("x: %d, y: %d, turn: %d\n", x, y, game_board_online.turn);
+					check_move(x, y, game_board_online.tab_color, game_board_online.turn, change);
+					if (change == true)
+					{
+						if (game_board_online.turn == black)
+						{
+							game_board_online.turn = white;
+							sendbufor[0] = x;
+							sendbufor[1] = y;
+							sendbufor[2] = game_board_online.turn;
+							/*send_number = x * 100 + y * 10 + game_board_online.turn;
+							std::string s = std::to_string(send_number);
+							char const *sendbufor = s.c_str();*/
+							printf("Wyslalem: %s\n", sendbufor);
+							printf("Wyslalem:: x: %c, y: %c, turn: %c\n", sendbufor[0]+48, sendbufor[1]+48, sendbufor[2]+48);
+							iResult = send(ConnectSocket, sendbufor, DEFAULT_BUFLEN, 0);
+							if (iResult == SOCKET_ERROR) {
+								printf("send failed: %d\n", WSAGetLastError());
+							}
+						}
+						else if (game_board_online.turn == white)
+						{
+							game_board_online.turn = black;
+							sendbufor[0] = x;
+							sendbufor[1] = y;
+							sendbufor[2] = game_board_online.turn;
+							/*send_number = x * 100 + y * 10 + game_board_online.turn;
+							std::string s = std::to_string(send_number);
+							char const *sendbufor = s.c_str();*/
+							printf("Wyslalem: %s\n", sendbufor);
+							printf("Wyslalem:: x: %c, y: %c, turn: %c\n", sendbufor[0]+48, sendbufor[1]+48, sendbufor[2]+48);
+							iResult = send(ConnectSocket, sendbufor, DEFAULT_BUFLEN, 0);
+							if (iResult == SOCKET_ERROR) {
+								printf("send failed: %d\n", WSAGetLastError());
+							}
+						}
+
+					}
+					is_move2(game_board_online.tab_color, game_board_online.turn);
 				}
-				is_move2(game_board_online.tab_color, game_board_online.turn);
 			}
 		}
-	}
-	else
-	{
-		sendbuf = "888\n";
-		iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
-		if (iResult == SOCKET_ERROR) {
-			printf("send failed: %d\n", WSAGetLastError());
+		else
+		{
+			sendbuf = "888\n";
+			iResult = send(ConnectSocket, sendbuf, DEFAULT_BUFLEN, 0);
+			if (iResult == SOCKET_ERROR) {
+				printf("send failed: %d\n", WSAGetLastError());
+			}
+			for (int i = 8;i > 0;i--) {
+				al_draw_filled_rectangle(150, 200, 650, 400, button_color);
+				al_draw_text(arial_36, black_color, 240, 270, 0, "WHITE          BLACK");
+				al_draw_textf(arial_36, black_color, 288, 300, 0, "%d                    %d", result(game_board_online.tab_color).first, result(game_board_online.tab_color).second);
+				al_draw_textf(arial_36, black_color, 400, 330, 0, "%d", i);
+				al_flip_display();
+				Sleep(1000);
+			}
+			board_id = 0;
+		
+		
 		}
-		for (int i = 8;i > 0;i--) {
-			al_draw_filled_rectangle(150, 200, 650, 400, button_color);
-			al_draw_text(arial_36, black_color, 240, 270, 0, "WHITE          BLACK");
-			al_draw_textf(arial_36, black_color, 288, 300, 0, "%d                    %d", result(game_board_online.tab_color).first, result(game_board_online.tab_color).second);
-			al_draw_textf(arial_36, black_color, 400, 330, 0, "%d", i);
-			al_flip_display();
-			Sleep(1000);
-		}
-		board_id = 0;
+		draw_board_online();
+		draw_color(game_board_online);
 	}
-
 }
 
 void board_online_receive(int mouse_x, int mouse_y, bool clicked, int &board_id, int ConnectSocket)
 {
-	int x = 0, y = 0;
-	iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-	///obsuga odebranej wiadomosci
+	
+	if (game_board_online.turn != myColor && game_board_online.end != true) {
+		int x = 0, y = 0, turn = 0;
+		iResult = recv(ConnectSocket, recvbuf, DEFAULT_BUFLEN, 0);
+		///obsuga odebranej wiadomosci
+		x = recvbuf[0];
+		y = recvbuf[1];
+		turn = recvbuf[2];
+		printf("Otrzymalem:: x: %d, y: %d, turn: %d\n", x, y, turn);
+		bool change = false;
+		draw_board_online();
+		draw_color(game_board_online);
+		is_end(game_board_online.tab_color, game_board_online.end);
+		if (game_board_online.end != true)
+		{
 
-	int send_number;
-	bool change = false;
-	draw_board_online();
-	draw_color(game_board_online);
-	is_end(game_board_online.tab_color, game_board_online.end);
-	if (game_board_online.end != true)
-	{
-		if (game_board_online.turn == myColor) {
-			x = mouse(mouse_x, mouse_y, game_board_online).first;
-			y = mouse(mouse_x, mouse_y, game_board_online).second;
 			if (x != 8 && y != 8)
 			{
-				printf("x: %d, y: %d, turn: %d\n", x, y, game_board_online.turn);
+				//printf("x: %d, y: %d, turn: %d\n", x, y, game_board_online.turn);
 				check_move(x, y, game_board_online.tab_color, game_board_online.turn, change);
 				if (change == true)
 				{
@@ -212,28 +239,31 @@ void board_online_receive(int mouse_x, int mouse_y, bool clicked, int &board_id,
 				}
 				is_move2(game_board_online.tab_color, game_board_online.turn);
 			}
-		}
-	}
-	else
-	{
-		ALLEGRO_FONT *arial_36 = al_load_font("arial.ttf", 36, 0);//  wskaŸnik do czcionki bitmapowej
 
-		sendbuf = "888\n";
-		iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
-		if (iResult == SOCKET_ERROR) {
-			printf("send failed: %d\n", WSAGetLastError());
 		}
-		for (int i = 8;i > 0;i--) {
-			al_draw_filled_rectangle(150, 200, 650, 400, button_color);
-			al_draw_text(arial_36, black_color, 240, 270, 0, "WHITE          BLACK");
-			al_draw_textf(arial_36, black_color, 288, 300, 0, "%d                    %d", result(game_board_online.tab_color).first, result(game_board_online.tab_color).second);
-			al_draw_textf(arial_36, black_color, 400, 330, 0, "%d", i);
-			al_flip_display();
-			Sleep(1000);
-		}
-		board_id = 0;
-	}
+		else
+		{
+			ALLEGRO_FONT *arial_36 = al_load_font("arial.ttf", 36, 0);//  wskaŸnik do czcionki bitmapowej
 
+			sendbuf = "888\n";
+			iResult = send(ConnectSocket, sendbuf, DEFAULT_BUFLEN, 0);
+			if (iResult == SOCKET_ERROR) {
+				printf("send failed: %d\n", WSAGetLastError());
+			}
+			for (int i = 8;i > 0;i--) {
+				al_draw_filled_rectangle(150, 200, 650, 400, button_color);
+				al_draw_text(arial_36, black_color, 240, 270, 0, "WHITE          BLACK");
+				al_draw_textf(arial_36, black_color, 288, 300, 0, "%d                    %d", result(game_board_online.tab_color).first, result(game_board_online.tab_color).second);
+				al_draw_textf(arial_36, black_color, 400, 330, 0, "%d", i);
+				al_flip_display();
+				Sleep(1000);
+			}
+			board_id = 0;
+		}
+		draw_board_online();
+		draw_color(game_board_online);
+	}
+	
 }
 
 void draw_board_offline()
