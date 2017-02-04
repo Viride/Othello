@@ -150,7 +150,6 @@ void board_online(int mouse_x, int mouse_y, bool clicked, int &board_id, int Con
 							/*send_number = x * 100 + y * 10 + game_board_online.turn;
 							std::string s = std::to_string(send_number);
 							char const *sendbufor = s.c_str();*/
-							printf("Wyslalem: %s\n", sendbufor);
 							printf("Wyslalem:: x: %c, y: %c, turn: %c\n", sendbufor[0]+48, sendbufor[1]+48, sendbufor[2]+48);
 							iResult = send(ConnectSocket, sendbufor, DEFAULT_BUFLEN, 0);
 							if (iResult == SOCKET_ERROR) {
@@ -166,7 +165,6 @@ void board_online(int mouse_x, int mouse_y, bool clicked, int &board_id, int Con
 							/*send_number = x * 100 + y * 10 + game_board_online.turn;
 							std::string s = std::to_string(send_number);
 							char const *sendbufor = s.c_str();*/
-							printf("Wyslalem: %s\n", sendbufor);
 							printf("Wyslalem:: x: %c, y: %c, turn: %c\n", sendbufor[0]+48, sendbufor[1]+48, sendbufor[2]+48);
 							iResult = send(ConnectSocket, sendbufor, DEFAULT_BUFLEN, 0);
 							if (iResult == SOCKET_ERROR) {

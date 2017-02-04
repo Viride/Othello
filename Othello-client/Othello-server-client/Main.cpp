@@ -218,6 +218,7 @@ int main(int argc, char** argv){
 						connected = true;
 					}
 					board_online(mouse_x, mouse_y, clicked, board_id, ConnectSocket);
+					al_flip_display();
 					board_online_receive( mouse_x, mouse_y, clicked, board_id, ConnectSocket);
 					break;
 				}
