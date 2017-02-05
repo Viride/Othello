@@ -1,0 +1,1 @@
+Adres, z którym client ma siê po³¹czyæ musi byæ wpisany do pliku adres.txt, tylko adresy IPv4.

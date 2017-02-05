@@ -1,10 +1,8 @@
 #define WIN32_LEAN_AND_MEAN
-///ADDED
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdlib.h>
-///END ADDAED
 #include <iostream>
 #include <stdio.h>
 #include <allegro5/allegro.h>
@@ -13,16 +11,13 @@
 #include <allegro5/allegro_font.h> // Plik nag³ówkowy dodaj¹cy czcionki
 #include <allegro5/allegro_ttf.h>
 #include "Map.h"
+#include <fstream>
+#include <string>
 
-///ADDED
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
-///END ADDED
-
-//#define width 800
-//#define height 700
 
 int mouse_x;
 int mouse_y;
@@ -43,6 +38,19 @@ void init() {
 
 int main(int argc, char** argv){
 
+	std::fstream plik;
+	plik.open("adres.txt", std::ios::in);
+	if (plik.good() == true)
+	{
+		printf("Uzyskano dostep do pliku!\n");
+		//tu operacje na pliku
+	}
+	else printf("Nie uzyskano dostepu do pliku!\n");
+
+
+	char dane[16];
+	plik.getline(dane, 16); //wczytanie CA£EGO jednego wiersza danych
+	plik.close();
 	///ADDED
 	WSADATA wsaData;
 	int iResult;
@@ -66,7 +74,7 @@ int main(int argc, char** argv){
 
 
 	// Resolve the server address and port
-	iResult = getaddrinfo(DEFAULT_ADDRES, DEFAULT_PORT, &hints, &result);
+	iResult = getaddrinfo(dane, DEFAULT_PORT, &hints, &result);
 	if (iResult != 0) {
 		printf("getaddrinfo failed: %d\n", iResult);
 		WSACleanup();
@@ -86,57 +94,6 @@ int main(int argc, char** argv){
 		WSACleanup();
 		return 1;
 	}
-	/*
-
-	int recvbuflen = DEFAULT_BUFLEN;
-
-	char *sendbuf = "this is a test";
-	char recvbuf[DEFAULT_BUFLEN];
-
-	// Send an initial buffer
-	iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
-	if (iResult == SOCKET_ERROR) {
-		printf("send failed: %d\n", WSAGetLastError());
-		closesocket(ConnectSocket);
-		WSACleanup();
-		return 1;
-	}
-
-	printf("Bytes Sent: %ld\n", iResult);
-
-	// shutdown the connection for sending since no more data will be sent
-	// the client can still use the ConnectSocket for receiving data
-	iResult = shutdown(ConnectSocket, SD_SEND);
-	if (iResult == SOCKET_ERROR) {
-		printf("shutdown failed: %d\n", WSAGetLastError());
-		closesocket(ConnectSocket);
-		WSACleanup();
-		return 1;
-	}
-
-	// Receive data until the server closes the connection
-	do {
-		iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-		if (iResult > 0)
-			printf("Bytes received: %d\n", iResult);
-		else if (iResult == 0)
-			printf("Connection closed\n");
-		else
-			printf("recv failed: %d\n", WSAGetLastError());
-	} while (iResult > 0);
-
-	// shutdown the send half of the connection since no more data will be sent
-	iResult = shutdown(ConnectSocket, SD_SEND);
-	if (iResult == SOCKET_ERROR) {
-		printf("shutdown failed: %d\n", WSAGetLastError());
-		closesocket(ConnectSocket);
-		WSACleanup();
-		return 1;
-	}
-	*/
-
-	/// END
-
 
 	al_init(); // inicjowanie biblioteki allegro
 	init();
@@ -155,15 +112,7 @@ int main(int argc, char** argv){
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 	al_register_event_source(event_queue, al_get_mouse_event_source());
 
-//	//CLIENT
-//	client = new ClientGame();
-
 	board_welcome(mouse_x, mouse_y, clicked, board_id);
-
-
-
-
-
 
 	while (!done) //koniec programu gdy wciœniemy klawisz Escape
 	{
@@ -187,7 +136,7 @@ int main(int argc, char** argv){
 				board_welcome(mouse_x, mouse_y, clicked, board_id);
 			}
 		}
-		else if (ev.type = ALLEGRO_EVENT_MOUSE_BUTTON_DOWN)
+		else if (ev.type = ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) //gdy wcisniemy przycisk myszki uruchomia sie odpowiednie eventy
 		{
 			if (ev.mouse.button & 1) {
 				mouse_x = ev.mouse.x;
@@ -201,6 +150,7 @@ int main(int argc, char** argv){
 					board_offline(mouse_x, mouse_y, clicked, board_id);
 					break;
 				case 2:
+					//£¹czenie z serverem
 					if (connected == false) {
 						iResult = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
 						if (iResult == SOCKET_ERROR) {
@@ -217,20 +167,19 @@ int main(int argc, char** argv){
 						printf("Polaczony\n");
 						connected = true;
 					}
-					board_online(mouse_x, mouse_y, clicked, board_id, ConnectSocket);
+					board_online(mouse_x, mouse_y, clicked, board_id, ConnectSocket); //Wysy³anie ruchu
 					al_flip_display();
-					board_online_receive( mouse_x, mouse_y, clicked, board_id, ConnectSocket);
+					board_online_receive( mouse_x, mouse_y, clicked, board_id, ConnectSocket); //Odbiór ruchu
 					break;
 				}
 
 			}
-			//tu bêdzie odwo³anie do ob³sugi klikniêcia
 		}
 		
 		al_flip_display(); // wyœwietlenie aktualnego bufora na ekran
 	}
 
-	//al_rest(3);
+	//Sprz¹tanie
 	al_destroy_display(display);
 	closesocket(ConnectSocket);
 	WSACleanup();

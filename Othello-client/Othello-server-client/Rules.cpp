@@ -27,7 +27,7 @@ void check_move(int x, int y, std::vector<std::vector<int>> &tab_color, int turn
 		move = false;
 	}
 }
-
+/*
 void is_move(std::vector<std::vector<int>>& tab_color, int turn, bool & is_move_b)
 {
 	bool move = false;
@@ -54,7 +54,7 @@ void is_move(std::vector<std::vector<int>>& tab_color, int turn, bool & is_move_
 		}
 	}
 }
-
+*/
 void is_move2(std::vector<std::vector<int>>& tab_color, int & turn)
 {
 	bool move = false;
