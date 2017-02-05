@@ -28,27 +28,14 @@ char read_black[bufor];
 char finish[bufor];
 char ok[bufor];
 int flaga=0;
+
 //struktura zawierająca dane, które zostaną przekazane do wątku
 struct thread_data_t
 {
     int socket;
 };
 
-//funkcja opisującą zachowanie wątku - musi przyjmować argument typu (void *) i zwracać (void *)
-void *ThreadBehavior(void *t_data)
-{
-    struct thread_data_t *th_data = (struct thread_data_t*)t_data;
-    //dostęp do pól struktury: (*th_data).pole
-    while(1){
-	bzero(cbBuf,1024);
-    	read((*th_data).socket, cbBuf, bufor);
-    	printf("%s\n", cbBuf);
-	if(cbBuf[0]=='q') break;
-    }
 
-
-    pthread_exit(NULL);
-}
 
 //funkcja obsługująca połączenie z nowym klientem
 void handleConnection(int player_white, int player_black) {
